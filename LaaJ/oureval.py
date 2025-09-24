@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    client = OpenAI(api_key="sk-2cfefbc81bea4324aecd3dcdec2084c9", base_url="https://api.deepseek.com")
+    client = OpenAI(api_key="your_api_key", base_url="https://api.deepseek.com")
 
     fq_qa_path = f"/Users/junfeng/Desktop/1research_project/doing/Unlearning/baselines_evaluation_result/QA/{args.task}/{args.dataset}_{args.task}_{args.method}_fq.jsonl"
 
