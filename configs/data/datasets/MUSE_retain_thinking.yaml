@@ -1,0 +1,9 @@
+MUSE_retain:
+  handler: PretrainingDataset
+  args:
+    hf_args:
+      path: "text"
+      #name: "raw"
+      split: "train"
+    text_key: "text"
+    max_length: 2048

@@ -1,3 +1,6 @@
+import os
+import huggingface_hub
+huggingface_hub.login("your_hf_key")
 import hydra
 from omegaconf import DictConfig
 from data import get_data, get_collators
@@ -5,7 +8,6 @@ from model import get_model
 from trainer import load_trainer
 from evals import get_evaluators
 from trainer.utils import seed_everything
-
 
 @hydra.main(version_base=None, config_path="../configs", config_name="train.yaml")
 def main(cfg: DictConfig):

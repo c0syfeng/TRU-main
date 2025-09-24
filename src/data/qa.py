@@ -60,6 +60,9 @@ class QADataset(Dataset):
     def __getitem__(self, idx):
         question = self.data[idx][self.question_key]
         answer = self.data[idx][self.answer_key]
+        if "thinking" in self.data[idx]:
+            answer = '<|im_start|>think\n' + self.data[idx]["thinking"] + "\n<|im_start|>answer\nAnswer:" + answer
+            #answer = '<|im_start|>think\n'  + "\n<|im_start|>answer\nAnswer:" + answer #without reasoning trace
         index = self.data[idx]["index"]
         if isinstance(answer, str):
             item = self._process_sample(question=question, answer=answer, index=index)

@@ -1,5 +1,6 @@
 import argparse
 import os
+os.environ["HF_ENDPOINT"]="https://hf-mirror.com"
 import subprocess
 from huggingface_hub import snapshot_download
 

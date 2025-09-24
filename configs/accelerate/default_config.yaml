@@ -9,5 +9,5 @@ main_process_ip: null
 main_process_port: null
 main_training_function: main
 num_machines: 1
-num_processes: 2
+num_processes: 2 # 3GPU;former values:2
 use_cpu: false

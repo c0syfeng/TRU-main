@@ -5,7 +5,7 @@ model_args:
 tokenizer_args:
   pretrained_model_name_or_path: "HuggingFaceH4/zephyr-7b-beta"
 template_args:
-  apply_chat_template: True
+  apply_chat_template: False
   system_prompt: You are a helpful assistant.
   system_prompt_with_special_tokens: "<|system|>\nYou are a helpful assistant.</s>\n"
   user_start_tag: "<|user|>\n"

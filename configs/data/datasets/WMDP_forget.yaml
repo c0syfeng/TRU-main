@@ -6,4 +6,4 @@ WMDP_forget:
       data_files: "data/wmdp/wmdp-corpora/cyber-forget-corpus.jsonl"
       split: "train"
     text_key: "text"
-    max_length: 512
+    max_length: 1024 #512

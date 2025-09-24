@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 
 class ForgetRetainDataset(Dataset):
     # https://github.com/OPTML-Group/SOUL/blob/main/src/dataset/Base.py
-    def __init__(self, forget, retain, anchor="forget"):
+    def __init__(self, forget, retain, forget_thinking, anchor="forget"):
         """Wraps the forget retain dataset into unlearning dataset.
 
         Args:
@@ -13,6 +13,7 @@ class ForgetRetainDataset(Dataset):
             anchor (str, optional): Specifies which dataset to anchor while randomly sampling from the other dataset. Defaults to 'forget'.
         """
         self.forget = forget
+        self.forget_thinking = forget_thinking
         self.retain = retain
         self.anchor = anchor
 
@@ -38,6 +39,10 @@ class ForgetRetainDataset(Dataset):
             if self.retain:
                 retain_idx = torch.randint(0, len(self.retain), (1,)).item()
                 item["retain"] = self.retain[retain_idx]
+            
+            if self.forget_thinking:
+                forget_thinking_idx = torch.randint(0, len(self.forget_thinking), (1,)).item()
+                item["forget_thinking"] = self.forget_thinking[forget_thinking_idx]
         elif self.anchor == "retain":
             item["retain"] = self.retain[idx]
             if self.forget:

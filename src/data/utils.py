@@ -8,11 +8,13 @@ IGNORE_INDEX = -100  # TODO put in common constants
 
 logger = logging.getLogger("data")
 
-
 def load_hf_dataset(path, **kwargs):
-    dataset = datasets.load_dataset(path, **kwargs)
+    if 'data_files' in kwargs and 'bio-retain' not in kwargs['data_files'] and 'cyber-retain' not in kwargs['data_files'] and 'cyber-forget' not in kwargs['data_files']:
+    #if 'bio-forget' in kwargs['data_files'] or 'bio_thinking-forget' in kwargs['data_files'] or 'cyber_thinking-forget' in kwargs['data_files'] or 'News_thinking-forget' in kwargs['data_files'] or 'News_thinking-retain' in kwargs['data_files']:
+        dataset = datasets.load_dataset('json', **kwargs)
+    else:
+        dataset = datasets.load_dataset(path, **kwargs)
     return dataset
-
 
 def preprocess_chat_instance(
     tokenizer,
@@ -163,17 +165,43 @@ def preprocess_pretraining_instance(
     Returns:
         Dict[str, torch.Tensor]: A dictionary containing 'input_ids', 'labels', and 'attention_mask' tensors for model input.
     """
-    full_seq_ids = tokenizer(
-        prefix + (" " if insert_space else "") + text_content, add_special_tokens=True
-    )["input_ids"]
-    prefix_ids = tokenizer(prefix, add_special_tokens=True)["input_ids"]
-    prefix_len = len(prefix_ids)
-    full_seq_ids = full_seq_ids[: prefix_len + max_length]  # manual truncation
+    #new
+    ttt = text_content.split("<|im_start|>think", 1)  # 确定text中thinking_token
+    if len(ttt) == 2:
+        end_token = tokenizer.eos_token
+        parts = text_content.split(end_token, 1) #划分question和answer
+        prefix = parts[0].strip() + end_token #添加end_token
+        thinking = parts[1].strip()
 
-    len_matched = prefix_len
-    if len_matched == 0:  # never give loss on index 0, when prefix is empty
-        len_matched = 1
-    labels = [IGNORE_INDEX] * len_matched + full_seq_ids[len_matched:]
+        prefix_ids = tokenizer(
+            prefix,
+            add_special_tokens=True,
+            max_length = int(max_length/2),
+            truncation=True
+        )["input_ids"]
+
+        thinking_ids = tokenizer(thinking, 
+                                 add_special_tokens=True,
+                                 max_length = int(max_length/2),
+                                 truncation=True
+                                 )["input_ids"]
+    
+        full_seq_ids = prefix_ids + thinking_ids
+        labels = [IGNORE_INDEX] * len(prefix_ids) + full_seq_ids[-len(thinking_ids):]
+
+    else:
+        full_seq_ids = tokenizer(
+            prefix + (" " if insert_space else "") + text_content, add_special_tokens=True
+        )["input_ids"] #获得全序列的token
+        prefix_ids = tokenizer(prefix, add_special_tokens=True)["input_ids"]#prefix的token
+        prefix_len = len(prefix_ids)
+        full_seq_ids = full_seq_ids[: prefix_len + max_length]  # manual truncation
+
+        len_matched = prefix_len
+        if len_matched == 0:  # never give loss on index 0, when prefix is empty
+            len_matched = 1
+
+        labels = [IGNORE_INDEX] * len_matched + full_seq_ids[len_matched:]
     item = {}
     if predict_with_generate:
         item["input_ids"] = prefix_ids

@@ -1,0 +1,8 @@
+MUSE_forget:
+  handler: PretrainingDataset
+  args:
+    hf_args:
+      path: "text"
+      split: "train"
+    text_key: "text"
+    max_length: 2048

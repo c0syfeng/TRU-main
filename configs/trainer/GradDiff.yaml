@@ -5,4 +5,4 @@ handler: GradDiff
 method_args:
   gamma: 1.0
   alpha: 1.0
-  retain_loss_type: NLL
+  retain_loss_type: NLL #KL for KL method

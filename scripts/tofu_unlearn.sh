@@ -5,26 +5,25 @@ export MASTER_PORT=$(python -c "import socket; s=socket.socket(); s.bind(('', 0)
 echo "Master Port: $MASTER_PORT"
 
 models=(
-    "Llama-3.2-1B-Instruct"
-    "Llama-3.2-3B-Instruct"
     "Llama-3.1-8B-Instruct"
 )
 trainers_experiments=(
-    "GradAscent unlearn/tofu/default.yaml"
+    #"GradAscent unlearn/tofu/default.yaml"
     "GradDiff unlearn/tofu/default.yaml"
-    "NPO unlearn/tofu/default.yaml"
-    "DPO unlearn/tofu/idk.yaml"
-    "RMU  unlearn/tofu/default.yaml"
+    #"NPO unlearn/tofu/default.yaml"
+    #"DPO unlearn/tofu/idk.yaml"
+    #"RMU  unlearn/tofu/default.yaml"
+    #"WGA  unlearn/tofu/default.yaml"
 )
 splits=(
     "forget01 holdout01 retain99"
-    "forget05 holdout05 retain95"
-    "forget10 holdout10 retain90"
+    #"forget05 holdout05 retain95"
+    #"forget10 holdout10 retain90"
 )
 
 
-per_device_train_batch_size=4 # on two gpus would make effective batch size 32
-gradient_accumulation_steps=4
+per_device_train_batch_size=8 # on two gpus would make effective batch size 32
+gradient_accumulation_steps=2  
 
 
 ########################################################################################################################
@@ -61,17 +60,7 @@ for split in "${splits[@]}"; do
             trainer.args.gradient_accumulation_steps=$gradient_accumulation_steps \
             trainer.args.ddp_find_unused_parameters=true \
             trainer.args.gradient_checkpointing=true
-
-            # Eval
-            CUDA_VISIBLE_DEVICES=0 python src/eval.py \
-            experiment=eval/tofu/default.yaml \
-            forget_split=${forget_split} \
-            holdout_split=${holdout_split} \
-            model=${model} \
-            task_name=${task_name} \
-            model.model_args.pretrained_model_name_or_path=saves/unlearn/${task_name} \
-            paths.output_dir=saves/unlearn/${task_name}/evals \
-            retain_logs_path=saves/eval/tofu_${model}_${retain_split}/TOFU_EVAL.json
+            
         done
     done
 done

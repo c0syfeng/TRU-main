@@ -1,0 +1,8 @@
+defaults:
+  - finetune
+
+handler: PO
+method_args:
+  beta: 0.1
+  alpha: 1.0
+  retain_loss_type: NLL

@@ -47,6 +47,8 @@ class DataCollatorForSupervisedDataset(object):
             input_ids = [instance["input_ids"] for instance in instances]
             input_ids = self._pad_tokens(input_ids, self.tokenizer.pad_token_id)
             attention_mask = input_ids.ne(self.tokenizer.pad_token_id)
+            if self.padding_side == "left":
+                attention_mask[:, -1] = True
             return_dct.update({"input_ids": input_ids})
             return_dct.update({"attention_mask": attention_mask})
             if "labels" in instances[0]:

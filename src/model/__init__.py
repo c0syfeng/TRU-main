@@ -6,8 +6,6 @@ import torch
 import logging
 from model.probe import ProbedLlamaForCausalLM
 
-hf_home = os.getenv("HF_HOME", default=None)
-
 logger = logging.getLogger(__name__)
 
 MODEL_REGISTRY: Dict[str, Any] = {}
@@ -54,7 +52,7 @@ def get_model(model_cfg: DictConfig):
             pretrained_model_name_or_path=model_path,
             torch_dtype=torch_dtype,
             **model_args,
-            cache_dir=hf_home,
+            cache_dir=os.getenv("HF_HOME", default=None),
         )
     except Exception as e:
         logger.warning(f"Model {model_path} requested with {model_cfg.model_args}")
@@ -62,6 +60,14 @@ def get_model(model_cfg: DictConfig):
             f"Error {e} while fetching model using {model_handler}.from_pretrained()."
         )
     tokenizer = get_tokenizer(tokenizer_args)
+
+    special_tokens_dict = {
+    "additional_special_tokens": ["<|im_start|>think", "<|im_start|>answer"]
+    }
+    tokenizer.add_special_tokens(special_tokens_dict)
+
+    model.resize_token_embeddings(len(tokenizer))
+    
     return model, tokenizer
 
 
@@ -80,7 +86,7 @@ def _add_or_replace_eos_token(tokenizer, eos_token: str) -> None:
 
 def get_tokenizer(tokenizer_cfg: DictConfig):
     try:
-        tokenizer = AutoTokenizer.from_pretrained(**tokenizer_cfg, cache_dir=hf_home)
+        tokenizer = AutoTokenizer.from_pretrained(**tokenizer_cfg, cache_dir=os.getenv("HF_HOME", default=None))
     except Exception as e:
         error_message = (
             f"{'--' * 40}\n"

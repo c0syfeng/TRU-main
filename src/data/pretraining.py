@@ -66,7 +66,7 @@ class PretrainingDataset(Dataset):
         super(PretrainingDataset, self).__init__()
         self.tokenizer = tokenizer
         self.max_length = max_length
-        self.chunks = self._chunk_raw_text(load_hf_dataset(**hf_args)[text_key])
+        self.chunks = load_hf_dataset(**hf_args)[text_key]
 
     def _chunk_raw_text(self, raw_text):
         raw_text = "\n\n".join(raw_text)
